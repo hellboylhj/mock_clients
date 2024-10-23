@@ -4,12 +4,12 @@ const fs = require('fs').promises;
 const EventEmitter = require('node:events');
 const path = require('path');
 const bodyParser = require('body-parser');
-const app = express();
 const PORT = 3000;
 const DB_PATH = path.join(__dirname, '../DB', 'db.json');
 const clientEvents = new EventEmitter();
 clientEvents.setMaxListeners(50);
 
+const app = express();
 app.use(bodyParser.json());
 app.use(cors())
 
@@ -98,7 +98,7 @@ app.post('/api/client/start', async (req, res) => {
  * API 3: 更新 Client 状态 (停止或还原)
  */
 app.post('/api/client/update', async (req, res) => {
-    const { id, status } = req.body; // 接收新的状态
+    const { id, status, usedBy } = req.body; // 接收新的状态
     try {
         const clients = await readDB();
         const client = clients.find((c) => c.id === id);
@@ -110,10 +110,11 @@ app.post('/api/client/update', async (req, res) => {
         // 更新状态
         client.status = status;
         client.runningTime = status === 'idle' ? 0 : client.runningTime;
-        client.usedBy = status === 'idle' ? null : client.usedBy;
+        client.usedBy = usedBy
 
         await writeDB(clients);
         console.log(`Client ${id} updated to status: ${status}`);
+        console.log(`Client ${id} updated to usedBy: ${usedBy}`);
         clientEvents.emit('clientStatusChanged');
 
         res.json({ message: 'Client updated', client });

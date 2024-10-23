@@ -16,9 +16,9 @@
   {
     "id": "3",
     "title": "Client-3",
-    "status": "running",
+    "status": "idle",
     "runningTime": 0,
-    "usedBy": null
+    "usedBy": "null"
   },
   {
     "id": "4",
